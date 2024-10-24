@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ProductComboModal from "../../../components/admin/productCombo/ProductComboModal";
+import ErrorModal from "../../../components/admin/ErrorModal";
 
 const ProductComboContainer = ({ onClose, idCombo }) => {
     const [combos, setCombos] = useState([]);
@@ -87,6 +88,11 @@ const ProductComboContainer = ({ onClose, idCombo }) => {
         return match ? match[1] : null;
     };
 
+    const closeErrorModal = () => {
+        setIsErrorModalOpen(false);
+        setError(null);
+    };
+
     return (
         <div>
             <ProductComboModal
@@ -94,6 +100,10 @@ const ProductComboContainer = ({ onClose, idCombo }) => {
                 onAddProductCombo={addProductCombo}
                 idCombo={idCombo}
                 onClose={onClose}
+            />
+            <ErrorModal 
+                isErrorModalOpen={isErrorModalOpen && error !== null} closeErrorModal={closeErrorModal} 
+                error={error}
             />
         </div>
     );

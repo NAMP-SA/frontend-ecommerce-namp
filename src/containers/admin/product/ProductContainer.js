@@ -161,8 +161,6 @@ const ProductContainer = () => {
         const match = errorText.match(regex);
         return match ? match[1] : null;
     };
-    
-
 
     const handleAddProductClick = () => {
         setEditingProduct(null);

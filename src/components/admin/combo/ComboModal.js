@@ -1,16 +1,17 @@
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, TextInput } from 'flowbite-react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 
-const ComboModal = ({ isOpen, onClose, onAddCombo, comboToEdit}) => {
+const ComboModal = ({ isOpen, onClose, onAddCombo, onUpdateCombo, comboToEdit }) => {
     const [combo, setCombo] = useState({
         name: '',
         description: '',
         price: '',
+        img: '',
         productCombo: [],
     });
     
     const [file, setFile] = useState(null);
-    const [query, setQuery] = useState('');
 
     useEffect(() => {
         if (comboToEdit) {
@@ -18,10 +19,11 @@ const ComboModal = ({ isOpen, onClose, onAddCombo, comboToEdit}) => {
                 name: comboToEdit.name,
                 description: comboToEdit.description,
                 price: comboToEdit.price,
+                img: comboToEdit.img,
                 productCombo: comboToEdit.productCombo || []
             });
         } else {
-            setCombo({ idCombo: '', name: '', description: '', price: '', productCombo: [] });
+            setCombo({ name: '', description: '', price: '', img: '', productCombo: [] });
             setFile(null);
         }
     }, [comboToEdit]);
@@ -46,18 +48,41 @@ const ComboModal = ({ isOpen, onClose, onAddCombo, comboToEdit}) => {
     };
 
     const handleSubmitCombo = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Mover esto al inicio
         try {
             const comboJson = {
                 name: combo.name,
                 description: combo.description,
                 price: combo.price,
-                productCombo: combo.productCombo
+                productCombo: combo.productCombo,
             };
-            await onAddCombo(comboJson, file);
+            console.log("Combo JSON:", comboJson)
+            if (comboToEdit) {
+                await onUpdateCombo(comboToEdit.idCombo, comboJson, file);
+                Swal.fire({
+                    title: '¡Actualizado!',
+                    text: 'El combo ha sido actualizado exitosamente.',
+                    icon: 'success',
+                    confirmButtonColor: '#057a55',
+                });
+            } else {
+                await onAddCombo(comboJson, file);
+                Swal.fire({
+                    title: '¡Creado!',
+                    text: 'El combo ha sido creado exitosamente.',
+                    icon: 'success',
+                    confirmButtonColor: '#057a55',
+                });
+            }
             onClose();
         } catch (error) {
-            console.error('Error al agregar/actualizar combo:', error);
+            console.error(error); // Agregar un log para ver errores
+            Swal.fire({
+                title: 'Error',
+                text: 'Ocurrió un error al procesar la solicitud.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+            });
         }
     };
 
